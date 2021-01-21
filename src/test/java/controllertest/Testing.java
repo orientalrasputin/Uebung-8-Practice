@@ -28,20 +28,6 @@ public class Testing {
                 }
             };
 
-    ArchCondition<JavaClass> onlyBeAccessedBySecuredMethods =
-            new ArchCondition<JavaClass>("only be accessed by @Secured methods") {
-                @Override
-                public void check(JavaClass item, ConditionEvents events) {
-                    for (JavaMethodCall call : item.getMethodCallsToSelf()) {
-                        if (!call.getOrigin().isAnnotatedWith(Secured.class)) {
-                            String message = String.format(
-                                    "Method %s is not @Secured", call.getOrigin().getFullName());
-                            events.add(SimpleConditionEvent.violated(call, message));
-                        }
-                    }
-                }
-            };
-
     @ArchTest
     static final ArchRule noDeprecatedClasses = noClasses()
             .should()
@@ -81,17 +67,26 @@ public class Testing {
             .callMethod()
             .onlyCallMethodsThat();
 
-
-    private static <T> ArchCondition<JavaClass> callAsyncMethodsFromTheSameClass(Class<? extends Annotation> clazz) {
-        return new ArchCondition<JavaClass>(String.format("call @%s Methods from the same class", clazz.getName())) {
+    static ArchCondition<JavaClass> getOnlyCalledFromSameClass =
+        new ArchCondition<JavaClass>("only be accessed by self") {
             @Override
-            public void check(JavaClass javaClass, ConditionEvents events) {
-                for (JavaMethodCall call : javaClass.getMethodCallsFromSelf()) {
-                    boolean originIsTarget = call.getOriginOwner().equals(call.getTargetOwner());
-                    if (call.getTarget().isAnnotatedWith(clazz)) {
-                        events.add(new SimpleConditionEvent(call, originIsTarget, call.getDescription()));
+            public void check(JavaClass item, ConditionEvents events) {
+                for (JavaMethodCall call : item.getMethodCallsToSelf()) {
+                    // Check that is annotated with ClassOnly
+                    if(call.getTarget().isAnnotatedWith(ClassOnly.class)) {
+                        // If ClassOnly methods are called by sth other than self class throw error
+                        boolean originIsTarget = call.getOriginOwner().equals(call.getTargetOwner());
+                        if (!originIsTarget) {
+                            String message = String.format(
+                                "Method %s is not self called", call.getOrigin().getFullName());
+                            events.add(SimpleConditionEvent.violated(call, message));
+                        }
                     }
                 }
             }
         };
+
+    @ArchTest
+    static final ArchRule methodsAndConstructorsWithClassOnlyMayNotCallFromOtherClasses = classes()
+            .should(getOnlyCalledFromSameClass);
 }
