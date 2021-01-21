@@ -13,6 +13,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
+
+import covidtracer.stereotypes.Mutable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -22,6 +24,7 @@ import org.springframework.web.client.HttpClientErrorException;
 public class KontaktListen {
 
   @Autowired
+  @Mutable
   KontaktListeRepository repo;
 
   public SortedMap<Integer, Long> kontakteNachZeitpunktSortiert() {
@@ -34,7 +37,7 @@ public class KontaktListen {
   }
 
   @ClassOnly
-  private static int alter(KontaktListe liste) {
+  public static int alter(KontaktListe liste) {
     LocalDate erstbefund = liste.getIndex().getErstbefund();
     LocalDate now = LocalDate.now();
     return Period.between(erstbefund, now).getDays();

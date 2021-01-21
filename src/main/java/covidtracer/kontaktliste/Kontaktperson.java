@@ -1,10 +1,15 @@
 package covidtracer.kontaktliste;
 
+import covidtracer.stereotypes.Mutable;
+
 import java.util.Objects;
 
 public class Kontaktperson {
+  @Mutable
   public String nachname;
+  @Mutable
   public String vorname;
+  @Mutable
   public String kontaktinformationen;
 
   public Kontaktperson(String nachname, String vorname, String kontaktinformationen) {

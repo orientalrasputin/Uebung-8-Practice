@@ -8,17 +8,24 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.util.HashSet;
 import java.util.Set;
+
+import covidtracer.stereotypes.Mutable;
 import org.springframework.data.annotation.Id;
 
 @AggregateRoot
 public class KontaktListe {
 
   @Id
+  @Mutable
   private Long id = null;
+  @Mutable
   private Index index = null;
+  @Mutable
   private Set<Kontaktperson> kontakte = new HashSet<>();
+  @Mutable
   private LocalDateTime changed;
 
+  @Mutable
   private LocalDate created;
 
 
@@ -29,7 +36,7 @@ public class KontaktListe {
   }
 
   @ClassOnly
-  private void touch() {
+  public void touch() {
     changed = LocalDateTime.now();
   }
 

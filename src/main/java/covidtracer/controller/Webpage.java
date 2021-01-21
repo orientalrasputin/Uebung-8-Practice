@@ -12,6 +12,8 @@ import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
+
+import covidtracer.stereotypes.Mutable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
@@ -25,9 +27,11 @@ import org.springframework.web.client.HttpClientErrorException;
 public class Webpage {
 
   @Autowired
+  @Mutable
   KontaktListen listen;
 
   @Autowired
+  @Mutable
   KontaktListeRepository repo;
 
   @GetMapping("/")
@@ -78,8 +82,5 @@ public class Webpage {
     model.addAttribute("alter", sortedByAge);
     return "report";
   }
-
-
-
 
 }
